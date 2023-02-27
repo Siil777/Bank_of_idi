@@ -7,32 +7,31 @@ from tkinter import messagebox as MessageBox
 
 ('-----------------------------------------------------------------------------') 
 search_list = list()
-s = ""
-
-def reset_list():
-    if s != entry_widget_name2.get():
-        print(entry_widget_name2.get())
-        search_list.clear()
-        text_widget_name2.tag_remove(SEL, 1.0,"end-1c")
-
+e = ""
 def search_words():
-    reset_list()
+    
     global search_list
-    global s
-    text_widget_name2.focus_set()
-    s = entry_widget_name2.get()
+    global e
+    text_widget_name1.focus_set()
+    #text_widget_name2.focus_set()
+    
+    
+    e = entry_widget_name2.get()
+   
 
-    if s:
+    if e:
         if search_list == []:
             idx = "1.0"
         else:
             idx = search_list[-1]
 
-        idx = text_widget_name2.search(s, idx, nocase=1, stopindex=END)
-        lastidx = '%s+%dc' % (idx, len(s))
+        idx = text_widget_name2.search(e, idx, nocase=1, stopindex=END)
+        
+        lastidx = '%s+%dc' % (idx, len(e))
 
         try:
             text_widget_name2.tag_remove(SEL, 1.0,lastidx)
+            text_widget_name1.tag_remove(SEL, 1.0,lastidx)
         except:
             pass
 
@@ -43,10 +42,22 @@ def search_words():
             text_widget_name2.mark_set("insert", "%d.%d" % (float(int(counter_list[0])), float(int(counter_list[1]))))
             text_widget_name2.see(float(int(counter_list[0])))
             search_list.append(lastidx)
+            text_widget_name1.tag_add(SEL, idx, lastidx)
+            counter_list = []
+            counter_list = str(idx).split('.')      
+            text_widget_name1.mark_set("insert", "%d.%d" % (float(int(counter_list[0])), float(int(counter_list[1]))))
+            text_widget_name1.see(float(int(counter_list[0])))
+            search_list.append(lastidx)
+            
+             
+          
+
+
         except:
             MessageBox.showinfo("Search complete","in the dictionary out there no matches")
             search_list.clear()
             text_widget_name2.tag_remove(SEL, 1.0,"end-1c")
+            
 
 def add_en():
     text_widget_name2.insert(END, entry_widget_name2.get())
@@ -78,9 +89,11 @@ lbl_frame_text2.pack(padx=10, pady=5, fill="both", expand=True)
 text_widget_name2 = Text(lbl_frame_text2)
 text_widget_name2.pack(fill="both", expand=True)
 
+
 scrollbar = Scrollbar(text_widget_name2, orient="vertical", command=text_widget_name2.yview, cursor="arrow")
 scrollbar.pack(fill="y", side="right")
 text_widget_name2.config(yscrollcommand=scrollbar.set)
+
 
 button_name = Button(root, text="Search", command=search_words)
 button_name.pack(fill=X)
@@ -97,17 +110,14 @@ button_name.pack(fill=X)
 search_list = list()
 s = ""
 
-def reset_list():
-    if s != entry_widget_name1.get():
-        print(entry_widget_name1.get())
-        search_list.clear()
-        text_widget_name1.tag_remove(SEL, 1.0,"end-1c")
+
 
 def search_word():
-    reset_list()
+    
     global search_list
     global s
-    text_widget_name1.focus_set()
+    #text_widget_name1.focus_set()
+    text_widget_name2.focus_set()
     s = entry_widget_name1.get()
 
     if s:
@@ -131,6 +141,12 @@ def search_word():
             text_widget_name1.mark_set("insert", "%d.%d" % (float(int(counter_list[0])), float(int(counter_list[1]))))
             text_widget_name1.see(float(int(counter_list[0])))
             search_list.append(lastidx)
+            text_widget_name2.tag_add(SEL, idx, lastidx)
+            counter_list = []
+            counter_list = str(idx).split('.')      
+            text_widget_name2.mark_set("insert", "%d.%d" % (float(int(counter_list[0])), float(int(counter_list[1]))))
+            text_widget_name2.see(float(int(counter_list[0])))
+            search_list.append(lastidx)
         except:
             MessageBox.showinfo("Search complete","in the dictionary out there no matches")
             search_list.clear()
@@ -149,6 +165,32 @@ def read_ru():
         lst = file.readlines()
     for item in lst:
         text_widget_name1.insert(END, item)
+
+def quiz():
+# Open the files
+    with open('eng_file.txt') as f:
+        eng = f.readlines()
+        with open('rus_file.txt', encoding='utf-8-sig') as f:
+            russian = f.readlines()
+
+            # Create the quiz
+            score = 0
+            for i in range(len(eng)):
+            # Get the word
+                word = eng[i].strip()
+                # Ask the question
+                answer = input(f'What is the word "{word}" in Russian?: ')
+                # Check the answer
+                if answer == russian[i].strip():
+                    score += 1
+                    print('Correct!')
+                else:
+                    print('Incorrect!')
+
+                # Print the result
+                print(f'You scored {score} out of {len(eng)}')
+
+
 
 lbl_frame_entry1 = LabelFrame(root, text="Enter the idiom to search", padx=5, pady=5)
 lbl_frame_entry1.pack(padx=10, pady=5, fill="both")
@@ -174,7 +216,8 @@ button_name1=Button(root, text='add ru', command=add_rus)
 button_name1.pack(fill=X)  
 button_name1=Button(root, text='save ru', command=save_ru)
 button_name1.pack(fill=X) 
+button = Button(root, text='Start Quiz', command=quiz)
+button.pack(fill=X)
 
 
 root.mainloop()
-
