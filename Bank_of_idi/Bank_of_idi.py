@@ -194,31 +194,69 @@ def read_ru():
 
 #                # Print the result
 #                print(f'You scored {score}') 
+#score = 0
+#i=0
+#def quiz():
+#    with open('eng_file.txt') as f:
+#        eng = f.readlines()
+#        with open('rus_file.txt', encoding='utf-8-sig') as f:
+#            russian = f.readlines()
+
+#        def check_answer(entry):  
+#            global score
+#            answer = entry.get()  
+#            if  answer == russian[i].strip(): 
+#                score += 1
+#                print('Correct!')
+#            else:
+#                print('Incorrect!')
+#                entry.destroy()
+#            if i < 4:
+#                ask_question()
+#            else:
+#                print(f'You scored {score}')
+
+#        def ask_question():
+#            global i
+#            i += 1
+#            word = eng[i].strip()
+#            label = Label(root, text=f'What is the word "{word}" in Russian?: ')
+#            label.pack()
+#            entry = Entry(root)
+#            entry.pack()
+#            button = Button(root, text='Submit', command=lambda: check_answer(entry))
+#            button.pack()
+
+#    i = -1
+#    ask_question()
+
+import random
+
 score = 0
-i=0
+i = 0
+
 def quiz():
     with open('eng_file.txt') as f:
         eng = f.readlines()
         with open('rus_file.txt', encoding='utf-8-sig') as f:
-            russian = f.readlines()
+            russian = f.readlines() 
+        def check_answer(entry): 
+                global score 
+                answer = entry.get() 
+                if answer == russian[i].strip(): 
+                    score += 1 
+                    print('Correct!')
+                else: 
+                    print('Incorrect!') 
+                    entry.destroy()
+                if i < 4: 
+                    ask_question()
+                else: 
+                    print(f'You scored {score}')
 
-        def check_answer(entry):  
-            global score
-            answer = entry.get()  
-            if  answer == russian[i].strip(): 
-                score += 1
-                print('Correct!')
-            else:
-                print('Incorrect!')
-                entry.destroy()
-            if i < 4:
-                ask_question()
-            else:
-                print(f'You scored {score}')
-
-        def ask_question():
-            global i
-            i += 1
+        def ask_question(): 
+            global i  
+            i += 1  
             word = eng[i].strip()
             label = Label(root, text=f'What is the word "{word}" in Russian?: ')
             label.pack()
@@ -227,8 +265,17 @@ def quiz():
             button = Button(root, text='Submit', command=lambda: check_answer(entry))
             button.pack()
 
-    i = -1
-    ask_question()
+
+
+# Generate 5 random idioms
+        random_idioms = random.sample(eng, 5)
+
+        for idiom in random_idioms:
+            i = eng.index(idiom)
+            ask_question()
+
+
+
 
 
 
