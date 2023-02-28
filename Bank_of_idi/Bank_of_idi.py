@@ -76,6 +76,7 @@ def read_eng():
         text_widget_name2.insert(END, item)
 root = Tk()
 root.geometry("500x600")
+root.title('Idi') 
 
 lbl_frame_entry2 = LabelFrame(root, text="Enter the idiom to search", padx=5, pady=5)
 lbl_frame_entry2.pack(padx=10, pady=5, fill="both")
@@ -166,29 +167,69 @@ def read_ru():
     for item in lst:
         text_widget_name1.insert(END, item)
 
+#def quiz():
+
+## Open the files
+
+#    with open('eng_file.txt') as f:
+#        eng = f.readlines()
+#        with open('rus_file.txt', encoding='utf-8-sig') as f:
+#            russian = f.readlines()
+
+#            # Create the quiz
+#            score = 0
+            
+#            for i in range(5):
+                
+#            # Get the word
+#                word = eng[i].strip()
+#                # Ask the question
+#                answer = input(f'What is the word "{word}" in Russian?: ')
+#                # Check the answer
+#                if answer == russian[i].strip():
+#                    score += 1
+#                    print('Correct!')
+#                else:
+#                    print('Incorrect!')
+
+#                # Print the result
+#                print(f'You scored {score}') 
+score = 0
+i=0
 def quiz():
-# Open the files
     with open('eng_file.txt') as f:
         eng = f.readlines()
         with open('rus_file.txt', encoding='utf-8-sig') as f:
             russian = f.readlines()
 
-            # Create the quiz
-            score = 0
-            for i in range(len(eng)):
-            # Get the word
-                word = eng[i].strip()
-                # Ask the question
-                answer = input(f'What is the word "{word}" in Russian?: ')
-                # Check the answer
-                if answer == russian[i].strip():
-                    score += 1
-                    print('Correct!')
-                else:
-                    print('Incorrect!')
+        def check_answer(entry):  
+            global score
+            answer = entry.get()  
+            if  answer == russian[i].strip(): 
+                score += 1
+                print('Correct!')
+            else:
+                print('Incorrect!')
+                entry.destroy()
+            if i < 4:
+                ask_question()
+            else:
+                print(f'You scored {score}')
 
-                # Print the result
-                print(f'You scored {score} out of {len(eng)}')
+        def ask_question():
+            global i
+            i += 1
+            word = eng[i].strip()
+            label = Label(root, text=f'What is the word "{word}" in Russian?: ')
+            label.pack()
+            entry = Entry(root)
+            entry.pack()
+            button = Button(root, text='Submit', command=lambda: check_answer(entry))
+            button.pack()
+
+    i = -1
+    ask_question()
+
 
 
 
@@ -216,8 +257,11 @@ button_name1=Button(root, text='add ru', command=add_rus)
 button_name1.pack(fill=X)  
 button_name1=Button(root, text='save ru', command=save_ru)
 button_name1.pack(fill=X) 
-button = Button(root, text='Start Quiz', command=quiz)
-button.pack(fill=X)
+#button = Button(root, text='Start Quiz', command=quiz)
+#button.pack(fill=X)
+quiz_button = Button(root, text='Start quiz', command=quiz)
+quiz_button.pack(fill=X)
+
 
 
 root.mainloop()
