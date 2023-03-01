@@ -1,3 +1,4 @@
+
 from tkinter import * 
 import tkinter as tk 
 from tkinter import ttk 
@@ -167,112 +168,43 @@ def read_ru():
     for item in lst:
         text_widget_name1.insert(END, item)
 
-#def quiz():
-
-## Open the files
-
-#    with open('eng_file.txt') as f:
-#        eng = f.readlines()
-#        with open('rus_file.txt', encoding='utf-8-sig') as f:
-#            russian = f.readlines()
-
-#            # Create the quiz
-#            score = 0
-            
-#            for i in range(5):
-                
-#            # Get the word
-#                word = eng[i].strip()
-#                # Ask the question
-#                answer = input(f'What is the word "{word}" in Russian?: ')
-#                # Check the answer
-#                if answer == russian[i].strip():
-#                    score += 1
-#                    print('Correct!')
-#                else:
-#                    print('Incorrect!')
-
-#                # Print the result
-#                print(f'You scored {score}') 
-#score = 0
-#i=0
-#def quiz():
-#    with open('eng_file.txt') as f:
-#        eng = f.readlines()
-#        with open('rus_file.txt', encoding='utf-8-sig') as f:
-#            russian = f.readlines()
-
-#        def check_answer(entry):  
-#            global score
-#            answer = entry.get()  
-#            if  answer == russian[i].strip(): 
-#                score += 1
-#                print('Correct!')
-#            else:
-#                print('Incorrect!')
-#                entry.destroy()
-#            if i < 4:
-#                ask_question()
-#            else:
-#                print(f'You scored {score}')
-
-#        def ask_question():
-#            global i
-#            i += 1
-#            word = eng[i].strip()
-#            label = Label(root, text=f'What is the word "{word}" in Russian?: ')
-#            label.pack()
-#            entry = Entry(root)
-#            entry.pack()
-#            button = Button(root, text='Submit', command=lambda: check_answer(entry))
-#            button.pack()
-
-#    i = -1
-#    ask_question()
-
-import random
-
-score = 0
-i = 0
-
 def quiz():
-    with open('eng_file.txt') as f:
-        eng = f.readlines()
-        with open('rus_file.txt', encoding='utf-8-sig') as f:
-            russian = f.readlines() 
-        def check_answer(entry): 
-                global score 
-                answer = entry.get() 
-                if answer == russian[i].strip(): 
-                    score += 1 
-                    print('Correct!')
-                else: 
-                    print('Incorrect!') 
-                    entry.destroy()
-                if i < 4: 
-                    ask_question()
-                else: 
-                    print(f'You scored {score}')
+    with open('eng_file.txt', encoding='utf-8-sig') as f:
+        eng = [line.strip() for line in f.readlines()]
+    with open('rus_file.txt', encoding='utf-8-sig') as f:
+        rus = [line.strip() for line in f.readlines()]
+    words = dict(zip(eng, rus))
+    random_idioms = random.sample(eng, 4)
+    score = 0
 
-        def ask_question(): 
-            global i  
-            i += 1  
-            word = eng[i].strip()
-            label = Label(root, text=f'What is the word "{word}" in Russian?: ')
-            label.pack()
-            entry = Entry(root)
-            entry.pack()
-            button = Button(root, text='Submit', command=lambda: check_answer(entry))
-            button.pack()
-
-
-
-# Generate 5 random idioms
-        random_idioms = random.sample(eng, 5)
-
-        for idiom in random_idioms:
-            i = eng.index(idiom)
+    def check_answer(entry, word):
+        nonlocal score
+        answer = entry.get().strip()
+        expected_answer = words[word]
+        if answer == expected_answer:
+            print('Correct!')
+            score += 1
+        else:
+            print('Incorrect!')
+        print(f"Expected answer: {expected_answer}")
+        print(f"Your answer: {answer}")
+        if len(random_idioms) > 0:
             ask_question()
+        else:
+            print(f'You scored {score}')
+
+    def ask_question():
+        word = random_idioms.pop()
+        label = Label(root, text=f'What is the word "{word}" in Russian?: ')
+        label.pack()
+        entry = Entry(root)
+        entry.pack()
+        button = Button(root, text='Submit', command=lambda: check_answer(entry, word))
+        button.pack()
+
+    for i, idiom in enumerate(random_idioms):
+        ask_question()
+
 
 
 
@@ -304,11 +236,12 @@ button_name1=Button(root, text='add ru', command=add_rus)
 button_name1.pack(fill=X)  
 button_name1=Button(root, text='save ru', command=save_ru)
 button_name1.pack(fill=X) 
-#button = Button(root, text='Start Quiz', command=quiz)
-#button.pack(fill=X)
 quiz_button = Button(root, text='Start quiz', command=quiz)
 quiz_button.pack(fill=X)
 
+
+
+root.mainloop()
 
 
 root.mainloop()
