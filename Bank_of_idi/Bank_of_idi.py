@@ -1,173 +1,90 @@
+import random
+from re import I
+from tkinter import*   
+from tkinter import messagebox
 
-from tkinter import * 
-import tkinter as tk 
-from tkinter import ttk 
-
-
-from tkinter import messagebox as MessageBox
-
-('-----------------------------------------------------------------------------') 
-search_list = list()
-e = ""
-def search_words():
-    
-    global search_list
-    global e
-    text_widget_name1.focus_set()
-    #text_widget_name2.focus_set()
-    
-    
-    e = entry_widget_name2.get()
-   
-
-    if e:
-        if search_list == []:
-            idx = "1.0"
-        else:
-            idx = search_list[-1]
-
-        idx = text_widget_name2.search(e, idx, nocase=1, stopindex=END)
-        
-        lastidx = '%s+%dc' % (idx, len(e))
-
-        try:
-            text_widget_name2.tag_remove(SEL, 1.0,lastidx)
-            text_widget_name1.tag_remove(SEL, 1.0,lastidx)
-        except:
-            pass
-
-        try:
-            text_widget_name2.tag_add(SEL, idx, lastidx)
-            counter_list = []
-            counter_list = str(idx).split('.')      
-            text_widget_name2.mark_set("insert", "%d.%d" % (float(int(counter_list[0])), float(int(counter_list[1]))))
-            text_widget_name2.see(float(int(counter_list[0])))
-            search_list.append(lastidx)
-            text_widget_name1.tag_add(SEL, idx, lastidx)
-            counter_list = []
-            counter_list = str(idx).split('.')      
-            text_widget_name1.mark_set("insert", "%d.%d" % (float(int(counter_list[0])), float(int(counter_list[1]))))
-            text_widget_name1.see(float(int(counter_list[0])))
-            search_list.append(lastidx)
-            
-             
-          
+import tkinter as tk  
 
 
-        except:
-            MessageBox.showinfo("Search complete","in the dictionary out there no matches")
-            search_list.clear()
-            text_widget_name2.tag_remove(SEL, 1.0,"end-1c")
-            
 
-def add_en():
-    text_widget_name2.insert(END, entry_widget_name2.get())
-    entry_widget_name2.delete(0, END) 
+# Define the paths to the text files containing the idioms
+ENG_FILE = "eng_file.txt"
+RUS_FILE = "rus_file.txt" 
 
 
-def save_en(): 
-    fail=open('eng_file.txt','w', encoding='utf-8-sig')   
-    fail.write(text_widget_name2.get('1.0', END)) 
-    fail.close
-            
-def read_eng():
-    with open('eng_file.txt', 'r') as file:
-        lst = file.readlines()
-    for item in lst:
-        text_widget_name2.insert(END, item)
+
+idioms={}
+#function call transation idiom. Takes an idiom as an argument and returns translation 
+#in the other language. Works by opening two files
+# It reads the idioms from both files simultaneously using zip()
+# and compares each idiom with the given idiom. If a match is found, it returns the 
+# corresponding idiom from the other file.
+def translate_idiom(idiom):
+    with open(ENG_FILE, 'r', encoding='utf-8-sig') as eng_file:
+        with open(RUS_FILE, 'r', encoding='utf-8-sig') as rus_file:
+            for eng, rus in zip(eng_file, rus_file):
+                if eng.strip() == idiom:
+                    return rus.strip()
+                elif rus.strip() == idiom:
+                    return eng.strip()
+    return "Idiom not found"
+# Create the function for the button
+def on_translate():
+    idiom = entry.get().strip()
+    translation = translate_idiom(idiom)
+    result_label.config(text=translation)
+
 root = Tk()
-root.geometry("500x600")
-root.title('Idi') 
+root.geometry('200x600')
+root.title("English-Russian Idiom Dictionary")
 
-lbl_frame_entry2 = LabelFrame(root, text="Enter the idiom to search", padx=5, pady=5)
-lbl_frame_entry2.pack(padx=10, pady=5, fill="both")
+# Create the input field
+entry = Entry(root)
+entry.pack()
 
-entry_widget_name2 = Entry(lbl_frame_entry2, width=50, justify = "left")
-entry_widget_name2.pack(fill="both")
+# Create the translate button
+translate_button = Button(root, text="Translate", command=on_translate)
+translate_button.pack()
 
-lbl_frame_text2 = LabelFrame(root, text="English", padx=5, pady=5, height=100)
-lbl_frame_text2.pack(padx=10, pady=5, fill="both", expand=True)
+# Create the label for the translation result
+result_label = Label(root, text="", font='Italic 15')
+result_label.pack() 
 
-text_widget_name2 = Text(lbl_frame_text2)
-text_widget_name2.pack(fill="both", expand=True)
+results_label = tk.Label(root, text="", font='Italic 15')
+results_label.pack()
 
+# Create a label for the add entry
+add_label = tk.Label(root, text="Add a new idiom:")
+add_label.pack()
+# Create the input fields for English and Russian idioms
+eng_lbl = tk.Label(root, text="Eng", padx=5, pady=5)
+eng_lbl.pack(padx=10, pady=5, fill="both")
+eng_entry = Entry(root)
+eng_entry.pack()
+rus_lbl = tk.Label(root, text="Rus", padx=5, pady=5)
+rus_lbl.pack(padx=10, pady=5, fill="both")
+rus_entry = Entry(root)
+rus_entry.pack()
+# Define a function to handle adding a new idiom
+def add_idiom():
+    # Get the new idioms from the entries
+    new_eng_idiom = eng_entry.get().strip()
+    new_rus_idiom = rus_entry.get().strip()
 
-scrollbar = Scrollbar(text_widget_name2, orient="vertical", command=text_widget_name2.yview, cursor="arrow")
-scrollbar.pack(fill="y", side="right")
-text_widget_name2.config(yscrollcommand=scrollbar.set)
+    # Add the new idioms to the dictionary and the text files
+    if new_eng_idiom and new_rus_idiom:
+        idioms[new_eng_idiom.lower()] = new_rus_idiom.lower()
+        with open(ENG_FILE, "a", encoding="utf-8-sig") as f_eng, open(RUS_FILE, "a", encoding="utf-8-sig") as f_rus:
+            f_eng.write(new_eng_idiom.lower() + "\n")
+            f_rus.write(new_rus_idiom.lower() + "\n")
 
-
-button_name = Button(root, text="Search", command=search_words)
-button_name.pack(fill=X)
-button_name=Button(root, text='Read', command=read_eng)
-button_name.pack(fill=X)
-button_name=Button(root, text='add en', command=add_en)
-button_name.pack(fill=X) 
-button_name=Button(root, text='save en', command=save_en)
-button_name.pack(fill=X)
-
-
-('-------------------------------------------------------------------------------')
-('--------------------------------------------------------------------------------') 
-search_list = list()
-s = ""
-
-
-
-def search_word():
-    
-    global search_list
-    global s
-    #text_widget_name1.focus_set()
-    text_widget_name2.focus_set()
-    s = entry_widget_name1.get()
-
-    if s:
-        if search_list == []:
-            idx = "1.0"
-        else:
-            idx = search_list[-1]
-
-        idx = text_widget_name1.search(s, idx, nocase=1, stopindex=END)
-        lastidx = '%s+%dc' % (idx, len(s))
-
-        try:
-            text_widget_name1.tag_remove(SEL, 1.0,lastidx)
-        except:
-            pass
-
-        try:
-            text_widget_name1.tag_add(SEL, idx, lastidx)
-            counter_list = []
-            counter_list = str(idx).split('.')      
-            text_widget_name1.mark_set("insert", "%d.%d" % (float(int(counter_list[0])), float(int(counter_list[1]))))
-            text_widget_name1.see(float(int(counter_list[0])))
-            search_list.append(lastidx)
-            text_widget_name2.tag_add(SEL, idx, lastidx)
-            counter_list = []
-            counter_list = str(idx).split('.')      
-            text_widget_name2.mark_set("insert", "%d.%d" % (float(int(counter_list[0])), float(int(counter_list[1]))))
-            text_widget_name2.see(float(int(counter_list[0])))
-            search_list.append(lastidx)
-        except:
-            MessageBox.showinfo("Search complete","in the dictionary out there no matches")
-            search_list.clear()
-            text_widget_name1.tag_remove(SEL, 1.0,"end-1c")
-def add_rus():
-    text_widget_name1.insert(END, entry_widget_name1.get())
-    entry_widget_name1.delete(0, END)
-
-def save_ru(): 
-    f=open('rus_file.txt','w', encoding='utf-8-sig')   
-    f.write(text_widget_name1.get('1.0', END)) 
-    f.close
-    
-def read_ru():
-    with open('rus_file.txt', 'r', encoding='utf-8-sig') as file:
-        lst = file.readlines()
-    for item in lst:
-        text_widget_name1.insert(END, item)
-
+        # Clear the entries and show a success message
+        eng_entry.delete(0, tk.END)
+        rus_entry.delete(0, tk.END)
+        results_label.config(text="Idiom added successfully!")
+    else:
+        results_label.config(text="Please enter an idiom in both languages to add.")
+        
 def quiz():
     with open('eng_file.txt', encoding='utf-8-sig') as f:
         eng = [line.strip() for line in f.readlines()]
@@ -182,17 +99,20 @@ def quiz():
         answer = entry.get().strip()
         expected_answer = words[word]
         if answer == expected_answer:
-            print('Correct!')
+            result_lbl=tk.Label(root, text='Correct!', fg='Green', font='Times 25')
+            result_lbl.pack(side='bottom')
+            result_lbl.delete(0,tk.END)
             score += 1
         else:
-            print('Incorrect!')
-        print(f"Expected answer: {expected_answer}")
+            result_lbl1=tk.Label(root, text='Incorrect!',fg='Red',font='Cmabria 25')
+            result_lbl1.pack(side='bottom')
+        messagebox.showinfo("Expected answer:",f" {expected_answer}")
         print(f"Your answer: {answer}")
         if len(random_idioms) > 0:
             ask_question()
         else:
             print(f'You scored {score}')
-
+    
     def ask_question():
         word = random_idioms.pop()
         label = Label(root, text=f'What is the word "{word}" in Russian?: ')
@@ -201,47 +121,14 @@ def quiz():
         entry.pack()
         button = Button(root, text='Submit', command=lambda: check_answer(entry, word))
         button.pack()
-
-    for i, idiom in enumerate(random_idioms):
+        
+    for i, idiom in enumerate(random_idioms): 
         ask_question()
 
-
-
-
-
-
-
-
-lbl_frame_entry1 = LabelFrame(root, text="Enter the idiom to search", padx=5, pady=5)
-lbl_frame_entry1.pack(padx=10, pady=5, fill="both")
-
-entry_widget_name1 = Entry(lbl_frame_entry1, width=50, justify = "left")
-entry_widget_name1.pack(fill="both")
-
-lbl_frame_text1 = LabelFrame(root, text="Russian", padx=5, pady=5, height=50)
-lbl_frame_text1.pack(padx=10, pady=5, fill="both", expand=True)
-
-text_widget_name1 = Text(lbl_frame_text1)
-text_widget_name1.pack(fill="both", expand=True)
-
-scrollbar = Scrollbar(text_widget_name1, orient="vertical", command=text_widget_name1.yview, cursor="arrow")
-scrollbar.pack(fill="y", side="right")
-text_widget_name1.config(yscrollcommand=scrollbar.set)
-
-button_name1 = Button(root, text="Search", command=search_word)
-button_name1.pack(fill=X)
-button_name1=Button(root, text='Read', command=read_ru)
-button_name1.pack(fill=X)
-button_name1=Button(root, text='add ru', command=add_rus)
-button_name1.pack(fill=X)  
-button_name1=Button(root, text='save ru', command=save_ru)
-button_name1.pack(fill=X) 
+add_button = tk.Button(root, text="Add", command=add_idiom)
+add_button.pack()
 quiz_button = Button(root, text='Start quiz', command=quiz)
-quiz_button.pack(fill=X)
-
-
+quiz_button.pack()
 
 root.mainloop()
 
-
-root.mainloop()
