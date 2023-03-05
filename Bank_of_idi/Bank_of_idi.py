@@ -101,7 +101,7 @@ def quiz():
         if answer == expected_answer:
             result_lbl=tk.Label(root, text='Correct!', fg='Green', font='Times 25')
             result_lbl.pack(side='bottom')
-            result_lbl.delete(0,tk.END)
+            
             score += 1
         else:
             result_lbl1=tk.Label(root, text='Incorrect!',fg='Red',font='Cmabria 25')
